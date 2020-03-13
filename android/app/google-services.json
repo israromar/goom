@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "759468907254",
+    "firebase_url": "https://goomapp-918e3.firebaseio.com",
+    "project_id": "goomapp-918e3",
+    "storage_bucket": "goomapp-918e3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759468907254:android:b0bcc0caa1aba132fdead7",
+        "android_client_info": {
+          "package_name": "com.goom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "759468907254-el18drtg07sbjkuhijs6hn2d998plfk3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.goom",
+            "certificate_hash": "c208b5f101d6cce3efb1273750851785309627a2"
+          }
+        },
+        {
+          "client_id": "759468907254-sm4k84urmdhul6hhc0disafrvcc480j3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbEVvThd9E09KUQ8DFw7-CkhPKoJvZ_HU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "759468907254-sm4k84urmdhul6hhc0disafrvcc480j3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
