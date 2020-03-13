@@ -21,7 +21,6 @@ import { ActionCreators as actions } from '../../redux/actions';
 import avatar from '../../assets/images/avatar7.png';
 import RNFetchBlob from 'react-native-fetch-blob'
 
-
 var options = {
     title: 'Select Avatar',
     customButtons: [
@@ -41,10 +40,6 @@ window.Blob = Blob
 
 
 class EditProfile extends Component {
-    static navigationOptions = {
-        header: null
-    };
-
     constructor(props) {
         super(props);
         this.getImage = this.getImage.bind(this)
@@ -55,6 +50,7 @@ class EditProfile extends Component {
             password: '',
             isLoginInitiated: false,
             isModalVisible: false,
+            imagePickerResponse: null,
             image_uri: 'https://avatars0.githubusercontent.com/u/12028011?v=3&s=200'
 
         },
@@ -93,8 +89,6 @@ class EditProfile extends Component {
             } else {
                 const source = { uri: response.uri }
 
-                console.log("selected image: ", response);
-
                 firebase.auth().onAuthStateChanged(currentUser => {
 
                     console.log("currentUser:", currentUser._user);
@@ -107,8 +101,6 @@ class EditProfile extends Component {
                     this.props.updateUserProfile(data, currentUser._user);
 
                 })
-
-                console.log("source:", source)
                 this.setState({
                     image: source
                 })
@@ -130,6 +122,8 @@ class EditProfile extends Component {
         })
     }
 
+
+
     uploadImage(response, mime = 'application/octet-stream') {
         return new Promise((resolve, reject) => {
             const uploadPath = Platform.OS === 'ios' ? response.uri.replace('file://', '') : response.path
@@ -150,8 +144,13 @@ class EditProfile extends Component {
                     return imageRef.getDownloadURL()
                 })
                 .then((url) => {
-                    console.log("url----", url)
-                    resolve(url)
+                    console.log("url----", url, this.props.user)
+                    resolve(url);
+                    const data = {
+                        displayName: 'name',
+                        displayImageUrl: url
+                    }
+                    this.props.updateUserProfile(data, this.props.user);
                 })
                 .catch((error) => {
                     reject(error)
@@ -179,11 +178,20 @@ class EditProfile extends Component {
                 // You can also display the image using data:
                 // let image_uri = { uri: 'data:image/jpeg;base64,' + response.data };
 
-                this.uploadImage(response)
-                    .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
-                    .catch(error => console.log("error occured: ", error))
+                const source = { uri: response.uri };
+                this.setState({ imagePickerResponse: response, image: source });
+
+                // this.uploadImage(response)
+                //     .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
+                //     .catch(error => console.log("error occured: ", error))
             }
         });
+    }
+
+    handleUploadImage = () => {
+        this.uploadImage(this.state.imagePickerResponse)
+            .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
+            .catch(error => console.log("error occured: ", error))
     }
 
     render() {
@@ -193,7 +201,7 @@ class EditProfile extends Component {
             <Container>
                 <Content>
                     <Thumbnail large source={this.state.image ? this.state.image : avatar} />
-                    <TouchableOpacity onPress={() => this.handleImageChange()}>
+                    <TouchableOpacity onPress={() => this.getImage()}>
                         <Text>Change Proifle Photo</Text>
                     </TouchableOpacity>
                     <Form>
@@ -206,7 +214,7 @@ class EditProfile extends Component {
                             <Input />
                         </Item>
                     </Form>
-                    <Button title="Upload Phote" onPress={this.getImage} />
+                    <Button title="Upload Photo" onPress={() => this.handleUploadImage()} />
                 </Content>
             </Container>
         );

@@ -43,6 +43,16 @@ class ProfileScreen extends React.Component {
 
     componentDidMount() {
         // this.fetchFeed();
+        if (this.props.user) {
+            console.log("profileImg-000000000000000000: ", this.props.user);
+
+            const source = { uri: this.props.user.photoURL }
+            console.log("profileImg-source:", source)
+            this.setState({
+                profileImg: source,
+                displayName: this.props.displayName
+            })
+        }
     }
 
     isSignedInWithGmail = async () => {
@@ -109,10 +119,7 @@ class ProfileScreen extends React.Component {
             this.props.toggleSideMenu();
         }
         if (prevProps.user !== this.props.user) {
-            console.log("profileImg: ", this.props.user);
-
             const source = { uri: this.props.user.photoURL }
-            console.log("profileImg-source:", source)
             this.setState({
                 profileImg: source,
                 displayName: this.props.displayName

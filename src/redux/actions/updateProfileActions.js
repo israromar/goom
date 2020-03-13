@@ -21,20 +21,15 @@ export function updateUserProfile(data, userObj) {
                 .updateProfile(data)
                 .then(() => firebase.auth().currentUser)
                 .then(user => {
-                    
+
                     console.log("user profile updated successfully", user);
 
                     let updatedUser = {
                         ...currentUser._user,
                         displayName: data.displayName,
-                        photoURL: data.displayImage
+                        photoURL: data.displayImageUrl
                     }
-
-                    if (updatedUser) {
-                        dispatch({ type: types.UPDATE_USER_PROFILE_INFO, payload: updatedUser })
-                    } else {
-                        console.log("user Object:", user);
-                    }
+                    dispatch({ type: types.UPDATE_USER_PROFILE_INFO, payload: updatedUser })
                 }).catch(error => {
                     console.log('error updating user profile', error)
                     dispatch({ type: types.UPDATE_USER_PROFILE_FAILED, error: error, payload: userObj })
