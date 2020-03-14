@@ -3,12 +3,12 @@
 import React, { Component, useState } from 'react';
 import {
     StyleSheet,
+    View,
     Text,
-    Button,
     Platform,
     TouchableOpacity
 } from 'react-native';
-import { Container, Thumbnail, Header, Content, Form, Item, Input, Label } from 'native-base';
+import { Container, Button, Thumbnail, Header, Body, Title, Left, Right, Content, Form, Item, Icon, Input, Label } from 'native-base';
 import uuid from 'uuid';
 import {
     GoogleSignin,
@@ -46,8 +46,10 @@ class EditProfile extends Component {
         this.state = {
             loading: false,
             image: null,
-            email: '',
-            password: '',
+            name: '',
+            username: '',
+            website: '',
+            bio: '',
             isLoginInitiated: false,
             isModalVisible: false,
             imagePickerResponse: null,
@@ -59,7 +61,15 @@ class EditProfile extends Component {
 
     componentDidMount = async () => {
         console.log("componentDidMount edit profile", firebase, this.props);
+        if (this.props.user) {
+            const source = { uri: this.props.user.photoURL };
+            this.setState({ image: source })
+        }
     };
+
+    componentDidUpdate(prevProps, prevState) {
+        // console.log("editprofile did update: ", prevProps, this.props);
+    }
 
     uploadPost = (post) => {
         const id = uuid.v4()
@@ -67,18 +77,18 @@ class EditProfile extends Component {
             id: id,
             postPhoto: post.photo,
             postTitle: post.title
-        }
+        };
         return firebase
             .firestore()
             .collection('posts')
             .doc(id)
             .set(uploadData)
-    }
+    };
 
     selectImage = () => {
         const options = {
             noData: true
-        }
+        };
         ImagePicker.launchImageLibrary(options, response => {
             if (response.didCancel) {
                 console.log('User cancelled image picker')
@@ -87,30 +97,24 @@ class EditProfile extends Component {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton)
             } else {
-                const source = { uri: response.uri }
-
+                const source = { uri: response.uri };
                 firebase.auth().onAuthStateChanged(currentUser => {
-
-                    console.log("currentUser:", currentUser._user);
-
                     const data = {
                         displayName: "Amir Khan",
                         displayImage: response.uri
                     };
-
                     this.props.updateUserProfile(data, currentUser._user);
-
-                })
+                });
                 this.setState({
                     image: source
                 })
             }
         })
-    }
+    };
 
     handleImageChange = () => {
         this.selectImage();
-    }
+    };
 
     onSubmit = async () => {
         firebase.auth().onAuthStateChanged(currentUser => {
@@ -120,9 +124,7 @@ class EditProfile extends Component {
             };
             this.props.updateUserProfile(data, currentUser._user);
         })
-    }
-
-
+    };
 
     uploadImage(response, mime = 'application/octet-stream') {
         return new Promise((resolve, reject) => {
@@ -149,7 +151,7 @@ class EditProfile extends Component {
                     const data = {
                         displayName: 'name',
                         displayImageUrl: url
-                    }
+                    };
                     this.props.updateUserProfile(data, this.props.user);
                 })
                 .catch((error) => {
@@ -181,18 +183,18 @@ class EditProfile extends Component {
                 const source = { uri: response.uri };
                 this.setState({ imagePickerResponse: response, image: source });
 
-                // this.uploadImage(response)
-                //     .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
-                //     .catch(error => console.log("error occured: ", error))
+                this.uploadImage(response)
+                    .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
+                    .catch(error => console.log("error occured: ", error))
             }
         });
     }
 
-    handleUploadImage = () => {
-        this.uploadImage(this.state.imagePickerResponse)
-            .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
-            .catch(error => console.log("error occured: ", error))
-    }
+    // handleUploadImage = () => {
+    //     this.uploadImage(this.state.imagePickerResponse)
+    //         .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
+    //         .catch(error => console.log("error occured: ", error))
+    // }
 
     render() {
         const uri = "https://facebook.github.io/react-native/docs/assets/favicon.png";
@@ -200,21 +202,37 @@ class EditProfile extends Component {
         return (
             <Container>
                 <Content>
-                    <Thumbnail large source={this.state.image ? this.state.image : avatar} />
-                    <TouchableOpacity onPress={() => this.getImage()}>
-                        <Text>Change Proifle Photo</Text>
-                    </TouchableOpacity>
+                    <View style={{
+                        flex: 1,
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginVertical: 15
+                    }}>
+                        <Thumbnail large source={this.state.image ? this.state.image : avatar} />
+                        <TouchableOpacity style={{ marginTop: 10, color: 'blue' }} onPress={() => this.getImage()}>
+                            <Text style={{ color: 'blue' }}>Change Profile Photo</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Form>
                         <Item floatingLabel>
+                            <Label style={{ marginBottom: 5 }}>Name</Label>
+                            <Input onChangeText={(name) => this.setState({ name })} />
+                        </Item>
+                        <Item floatingLabel>
                             <Label>Username</Label>
-                            <Input />
+                            <Input onChangeText={(username) => this.setState({ username })} />
+                        </Item>
+                        <Item floatingLabel>
+                            <Label>Website</Label>
+                            <Input onChangeText={(website) => this.setState({ website })} />
                         </Item>
                         <Item floatingLabel last>
-                            <Label>Password</Label>
-                            <Input />
+                            <Label>Bio</Label>
+                            <Input onChangeText={(bio) => this.setState({ bio })} />
                         </Item>
                     </Form>
-                    <Button title="Upload Photo" onPress={() => this.handleUploadImage()} />
+                    {/* <Button title="Upload Photo" onPress={() => this.handleUploadImage()} /> */}
                 </Content>
             </Container>
         );
@@ -222,7 +240,6 @@ class EditProfile extends Component {
 }
 
 function mapStateToProps(state) {
-    console.log("Update user profile: ", state);
     return {
         user: state.loginReducer.user,
     };

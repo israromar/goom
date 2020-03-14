@@ -32,17 +32,14 @@ class PhoneAuthComponent extends Component {
     handleSendCode = () => {
         // Request to send OTP
         if (this.validatePhoneNumber()) {
-            console.log("phone---", this.state);
             firebase
                 .auth()
                 .signInWithPhoneNumber(this.state.phone)
                 .then(confirmResult => {
-                    console.log("handleSendCode---", confirmResult);
                     this.setState({ confirmResult })
                 })
                 .catch(error => {
                     alert(error.message)
-
                     console.log(error)
                 })
         } else {
@@ -52,7 +49,6 @@ class PhoneAuthComponent extends Component {
 
     handleVerifyCode = () => {
         // Request for OTP verification
-        console.log("handleVerifyCode----", this.state);
         const { navigate } = this.props.navigation;
         const { confirmResult, verificationCode } = this.state
         if (verificationCode.length == 6) {

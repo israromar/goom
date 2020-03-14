@@ -13,7 +13,6 @@ export default class BottomTabNavigationWithSideMenu extends Component {
         this.toggleSideMenu = this.toggleSideMenu.bind(this)
     }
     toggleSideMenu() {
-        console.log("btm---", this.state)
         this.setState({
             isOpen: !this.state.isOpen
         })

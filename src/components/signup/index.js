@@ -36,7 +36,6 @@ const SignUp = (props) => {
             name: name,
             email: email
         }).then(user => {
-            console.log("data entry callback---", user);
             navigate('Home');
         }).catch(error => {
             console.log("error:", error);

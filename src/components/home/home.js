@@ -118,8 +118,6 @@ class HomeScreen extends React.Component {
         );
 
         const posts = await response.json();
-        console.log(posts.data, "data");
-
         const comments = await this.makeCommentsList(posts.data);
 
         this.setState({

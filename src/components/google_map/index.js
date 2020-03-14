@@ -87,7 +87,6 @@ export default class Map extends React.Component {
                 }
             )
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log("You can use the location", Geolocation)
                 // alert("You can use the location");
                 Geolocation.getCurrentPosition(
                     (position) => {
@@ -109,19 +108,10 @@ export default class Map extends React.Component {
                             latitudeDelta: LATITUDE_DELTA,
                             longitudeDelta: LONGITUDE_DELTA
                         })
-
-                        // speed: 0
-                        // heading: 0
-                        // accuracy: 16.7810001373291
-                        // altitude: 401.8999938964844
-                        // longitude: 73.1245396
-                        // latitude: 33.5511518
-
-                        console.log("user current location---", position);
                     },
                     (error) => {
                         // See error code charts below.
-                        console.log("eorrrrrrrrrrrrrrrrrrrrrrrrr", error.code, error.message);
+                        console.log("error", error.code, error.message);
                     },
                     { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
                 );
@@ -140,7 +130,6 @@ export default class Map extends React.Component {
     }
 
     onRegionChangeComplete = (initialPosition) => {
-        console.log("onRegionChangeComplete--", initialPosition);
         this.setState({ initialPosition })
     }
     // useEffect((val) => {
@@ -157,7 +146,6 @@ export default class Map extends React.Component {
     //     });
     // })
     render() {
-        console.log("Coords---:", this.state);
         return (
             <View style={styles.container}>
                 <MapView
@@ -178,7 +166,7 @@ export default class Map extends React.Component {
                     initialRegion={this.state.initialPosition}
                 >
                     <View style={styles.markerFixed}>
-                        <MapView.Marker coordinate={this.state.initialPosition} draggable onDragEnd={(e) => console.log('data', e.currentTarget)} />
+                        <MapView.Marker coordinate={this.state.initialPosition} draggable onDragEnd={(e) => console.log('Marker position:', e.currentTarget)} />
                     </View>
                     {/* <View style={styles.markerFixed}>
                         <Image style={styles.marker} source={marker} />

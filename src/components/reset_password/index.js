@@ -36,16 +36,11 @@ export default class ResetPassword extends Component {
     }
 
     componentDidMount() {
-        console.log("UserInfocomponentDidMount---");
-
         getCurrentUserInfo = async () => {
             try {
                 const userInfo = await GoogleSignin.signInSilently();
-                console.log("UserInfoResp---", userInfo);
                 this.setState({ userInfo });
             } catch (error) {
-                console.log("UserInfoError---", error);
-
                 if (error.code === statusCodes.SIGN_IN_REQUIRED) {
                     // user has not signed in yet
                 } else {
@@ -58,7 +53,6 @@ export default class ResetPassword extends Component {
     componentDidUpdate(prevProps, prevState) {
         const { navigate } = this.props.navigation;
         if (prevState.userInfo !== this.state.userInfo) {
-            console.log("this.state.userInfo", this.state.userInfo);
             if (this.state.userInfo) {
                 navigate('Home');
             }
@@ -93,13 +87,11 @@ export default class ResetPassword extends Component {
                 Alert.alert('Enter email address!')
             }
         } else if (viewId === 'login') {
-            console.log("firebase instance---:", firebase.auth().signInWith);
             firebase.auth()
                 .signInWithEmailAndPassword(this.state.email, this.state.password)
                 .then(() => navigate('Home'))
                 .catch(error => console.log(error))
         } else if (viewId === 'signin_phone') {
-            console.log("here--", viewId);
             navigate('PhoneAuth');
         } else {
             navigate('SignUp');
@@ -110,8 +102,6 @@ export default class ResetPassword extends Component {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
-
-            console.log("GoogleSignin UserInfo--", userInfo);
             this.setState({ userInfo });
         } catch (error) {
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {

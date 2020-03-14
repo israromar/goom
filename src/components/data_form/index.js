@@ -27,13 +27,9 @@ const DataForm = (props) => {
     useEffect(() => { _storeData(); }, [userRecords])
 
     const _storeData = async () => {
-        console.log("data--", userRecords);
         const getData = JSON.parse(await _retrieveData());
-        console.log("getData: ", (getData));
-
         if (userRecords.length > 0) {
             if (getData === null) {
-                console.log("here--");
                 try {
                     await AsyncStorage.setItem('USER_RECORDS', JSON.stringify(userRecords));
                 } catch (error) {
@@ -41,9 +37,7 @@ const DataForm = (props) => {
                     console.log("error storing value:", error);
                 }
             } else {
-                console.log("here2222", getData, userRecords);
                 const farray = getData.concat(userRecords);
-                console.log("farray:", farray);
                 try {
                     await AsyncStorage.setItem('USER_RECORDS', JSON.stringify(farray));
                 } catch (error) {
@@ -58,12 +52,9 @@ const DataForm = (props) => {
         try {
             const value = await AsyncStorage.getItem('USER_RECORDS');
             if (value !== null) {
-                console.log("value from async: ", JSON.parse(value));
-
                 // We have data!!
                 return value;
             } else {
-                console.log("else value", value);
                 return null;
             }
         } catch (error) {
@@ -73,9 +64,7 @@ const DataForm = (props) => {
     };
 
     const _writeFile = () => {
-        console.log("RNFS: ", RNFS);
         var path = RNFS.DocumentDirectoryPath + '/test.txt';
-
         // write the file
         RNFS.writeFile(path, 'Lorem ipsum dolor sit amet', 'utf8')
             .then((success) => {
@@ -177,12 +166,6 @@ export default DataForm;
 const resizeMode = 'cover';
 
 const styles = StyleSheet.create({
-
-    // container: {
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    // },
     formContainer: {
         height: 400,
         padding: 20

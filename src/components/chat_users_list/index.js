@@ -44,13 +44,11 @@ export default class ChatUsersList extends Component {
   }
 
   handleOnPress = (item) => {
-    console.log("handleOnPress", item);
     const { navigate } = this.props.navigation;
     navigate('ChatView', { id: item.id });
   }
 
   renderItem = ({ item }) => {
-    console.log("item: ", item);
     var callIcon = "https://img.icons8.com/color/48/000000/phone.png";
     if (item.video == true) {
       callIcon = "https://img.icons8.com/color/48/000000/video-call.png";

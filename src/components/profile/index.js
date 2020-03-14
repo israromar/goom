@@ -6,9 +6,10 @@ import {
     Dimensions,
     FlatList,
     Image,
-    Button
+    Button,
+    TouchableOpacity
 } from "react-native";
-import { Container, Thumbnail, Header, Content, Form, Item, Input, Label } from 'native-base';
+import { Container, Thumbnail, Header, Content, Form, Item, Input, Label, Tab, Tabs, TabHeading, Icon, } from 'native-base';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -20,6 +21,8 @@ import {
 } from '@react-native-community/google-signin';
 import firebase from 'react-native-firebase';
 import { Loader } from "../../components/loader";
+import Posts from './posts';
+import Tagged from './tagged';
 import { ActionCreators as actions } from '../../redux/actions/index';
 // import { requestLogin } from '../../redux/actions/loginActions';
 const { width, height } = Dimensions.get("window");
@@ -44,10 +47,7 @@ class ProfileScreen extends React.Component {
     componentDidMount() {
         // this.fetchFeed();
         if (this.props.user) {
-            console.log("profileImg-000000000000000000: ", this.props.user);
-
             const source = { uri: this.props.user.photoURL }
-            console.log("profileImg-source:", source)
             this.setState({
                 profileImg: source,
                 displayName: this.props.displayName
@@ -133,54 +133,65 @@ class ProfileScreen extends React.Component {
     }
 
     renderHeader = () => {
-        console.log("this.state.profileImg", this.state.profileImg);
         const imageUrl = this.state.profileImg;
         return (
-            <View style={{ padding: 20, flexDirection: "row" }}>
-                <View style={styles.profileImage}>
-                    {/* <Image
-                        resizeMode="cover"
-                        style={styles.profileImage}
-                        source={imageUrl}
-                    /> */}
-                    <Thumbnail style={styles.profileImage} large source={this.state.profileImg ? this.state.profileImg : avatar} />
-                </View>
-                <View
-                    style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 5
-                    }}
-                >
-                    <View style={{ flexDirection: "row", flex: 1 }}>
-                        <View style={{ flex: 1, alignItems: "center" }}>
-                            <Text>39</Text>
-                            <Text>Posts</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: "center" }}>
-                            <Text>339</Text>
-                            <Text>followers</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: "center" }}>
-                            <Text>393</Text>
-                            <Text>following</Text>
-                        </View>
+            <View>
+                <View style={{ padding: 20, flexDirection: "row" }}>
+                    <View style={[styles.profileImage], { backgroundColor: 'none' }}>
+                        <Thumbnail style={styles.profileImage} large source={this.state.profileImg ? this.state.profileImg : avatar} />
+                        <Text>Israr Khan</Text>
+                        <Text>pk</Text>
+                        <Text>Softech</Text>
                     </View>
                     <View
                         style={{
-                            borderWidth: 1,
-                            width: "100%",
-                            marginLeft: 1,
-                            alignItems: "center"
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 5
                         }}
                     >
-                        {/* <CustomProfileHeader type="right" {...this.props} /> */}
-                        {/* <Text>Edit Profile</Text> */}
-                        {/* <Text>Sign Out</Text> */}
-                        <Button title="Edit Profile" color="grey" onPress={this.handleEditProfile} />
+                        <View style={{ flexDirection: "row", flex: 1 }}>
+                            <View style={{ flex: 1, alignItems: "center" }}>
+                                <Text>39</Text>
+                                <Text>Posts</Text>
+                            </View>
+                            <View style={{ flex: 1, alignItems: "center" }}>
+                                <Text>329</Text>
+                                <Text>followers</Text>
+                            </View>
+                            <View style={{ flex: 1, alignItems: "center" }}>
+                                <Text>593</Text>
+                                <Text>following</Text>
+                            </View>
+                        </View>
                     </View>
+                    {/* <View style={{
+                        flex: 1,
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'stretch',
+                    }}>
+                        <View style={{ width: 50, height: 50, backgroundColor: 'powderblue' }} />
+                        <View style={{ height: 50, backgroundColor: 'skyblue' }} />
+                        <View style={{ height: 100, backgroundColor: 'steelblue' }} />
+                    </View> */}
                 </View>
+                <TouchableOpacity onPress={this.handleEditProfile} >
+                    <View
+                        style={{
+                            borderWidth: 1,
+                            height: 30,
+                            borderRadius: 10,
+                            width: "100%",
+                            marginLeft: 0,
+                            alignItems: "center",
+                            backgroundColor: 'none'
+                        }}
+                    >
+                        <Text>Edit Profile</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         );
     };
@@ -200,12 +211,22 @@ class ProfileScreen extends React.Component {
     };
 
     render() {
-        console.log("user-------", this.props)
         const { navigate } = this.props.navigation;
         return (
             <View style={styles.container}>
                 <Loader loading={this.state.loaded} text="Loading..." />
                 {this.renderHeader()}
+                <Tabs>
+                    <Tab heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
+                        <Posts />
+                    </Tab>
+                    <Tab initialPage heading={<TabHeading><Icon type="MaterialIcons" name="perm-contact-calendar" /></TabHeading>}>
+                        <Tagged />
+                    </Tab>
+                    {/* <Tab heading="Tab3">
+                        <Posts />
+                    </Tab> */}
+                </Tabs>
                 <FlatList
                     numColumns={3}
                     data={this.state.data}

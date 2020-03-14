@@ -82,7 +82,7 @@ class LoginView extends Component {
             .then((user) => { navigate('Home') })
             .catch((error) => {
                 Alert.alert("Email or password is incorrect!");
-                console.log("Email or password is incorrect!--", error)
+                console.log("Email or password is incorrect!", error)
             })
     };
 
@@ -123,7 +123,6 @@ class LoginView extends Component {
     };
 
     render() {
-        // console.log("this.props:", this.props);
         return (
             <View style={styles.container}>
                 <Image style={styles.bgImage} source={{ uri: "https://i.picsum.photos/id/1057/6016/4016.jpg" }} />

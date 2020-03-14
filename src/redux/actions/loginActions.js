@@ -7,13 +7,11 @@ import firebase from 'react-native-firebase';
 import * as types from './actionTypes';
 
 export function requestLogin(email, password) {
-    console.log("loginin action:", email, password);
     return (dispatch, getState) => {
         dispatch({ type: types.LOGIN_REQUEST, email, password })
         firebase.auth()
             .signInWithEmailAndPassword(email, password)
             .then((user) => {
-                console.log("userObj: ", user);
                 // navigate('Home')
                 if (user !== null) {
                     dispatch({ type: types.LOGIN_RESPONSE, user: user.user._user })
@@ -33,7 +31,6 @@ export function requestLogin(email, password) {
 }
 
 export function requestLogout() {
-    console.log("logout---:");
     return (dispatch, getState) => {
         dispatch({ type: types.LOGOUT_REQUEST })
     }

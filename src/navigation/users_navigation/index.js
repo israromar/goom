@@ -3,11 +3,19 @@ import { StyleSheet, Text } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Screens from '../../screens';
+import CustomeEditProfileHeader from '../../components/custome_edit_profile_header';
 
 const UsersNavigator = createStackNavigator({
     EditProfile: {
-        screen: Screens.EditProfileScreen
+        screen: Screens.EditProfileScreen,
+        navigationOptions: ({ navigation }) => ({
+            headerTitle: 'Edit Profile',
+            headerShown: true,
+            headerLeft: () => <CustomeEditProfileHeader type={'left'} />,
+            headerRight: () => <CustomeEditProfileHeader type={'right'} navigationProps={navigation} />
+        })
     },
     UsersList: {
         screen: Screens.UsersListScreen,
