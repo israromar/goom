@@ -46,6 +46,7 @@ class LoginView extends Component {
 
     componentDidMount = async () => {
         const { navigate } = this.props.navigation;
+        console.log("await GoogleSignin.isSignedIn()", await GoogleSignin.isSignedIn());
         if (await GoogleSignin.isSignedIn()) {
             navigate('Home');
         }

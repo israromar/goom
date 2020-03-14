@@ -20,7 +20,7 @@ class ProfileScreen extends React.Component {
     }
 
     render() {
-        const menu = <Menu  {...this.props} />;
+        const menu = <Menu {...this.props} />;
         return (
             <SideMenu menuPosition="right" isOpen={this.state.isOpen} menu={menu}>
                 <ProfileScreenComp {...this.props} toggleSideMenu={this.toggleSideMenu.bind(this)} />

@@ -21,12 +21,14 @@ class Menu extends Component {
     }
 
     handleSignout = async () => {
+        // this.props.requestLogout();
+        // navigate('Auth');
         const { navigate } = this.props.navigation;
         if (await GoogleSignin.isSignedIn()) {
             try {
                 await GoogleSignin.revokeAccess();
-                await GoogleSignin.signOut().then(() => {
-                    this.props.requestLogout();
+                await GoogleSignin.signOut().then(async () => {
+                    await this.props.requestLogout();
                     navigate('Auth');
                 });
                 // this.setState({ user: null }); // Remember to remove the user from your app's state as well

@@ -131,10 +131,6 @@ class HomeScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <Loader loading={this.state.loaded} text="Loading..." />
-                {/*<View style={styles.header}>*/}
-                {/*    <Icon name='camera' size={28} color='black'/>*/}
-                {/*    <Icon name='paper-plane' size={28} color='black'/>*/}
-                {/*</View>*/}
                 <FlatList
                     data={this.state.data}
                     renderItem={({ item, index }) => this.createPost(item, index)}

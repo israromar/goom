@@ -6,10 +6,13 @@ import {
     View,
     Text,
     Platform,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 } from 'react-native';
 import { Container, Button, Thumbnail, Header, Body, Title, Left, Right, Content, Form, Item, Icon, Input, Label } from 'native-base';
-import uuid from 'uuid';
+// import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
     GoogleSignin,
 } from '@react-native-community/google-signin';
@@ -68,22 +71,8 @@ class EditProfile extends Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        // console.log("editprofile did update: ", prevProps, this.props);
+        console.log("editprofile did update: ", prevProps, this.props);
     }
-
-    uploadPost = (post) => {
-        const id = uuid.v4()
-        const uploadData = {
-            id: id,
-            postPhoto: post.photo,
-            postTitle: post.title
-        };
-        return firebase
-            .firestore()
-            .collection('posts')
-            .doc(id)
-            .set(uploadData)
-    };
 
     selectImage = () => {
         const options = {
@@ -126,12 +115,39 @@ class EditProfile extends Component {
         })
     };
 
-    uploadImage(response, mime = 'application/octet-stream') {
+
+    uploadPost = post => {
+        // const id = uuidv4();
+        const uploadData = {
+            id: '1b671a64-40d5-491e-99b0-da01ff1f33499',
+            postPhoto: post.photo,
+            postTitle: 'my post',
+            postUrl: post.postUrl,
+            caption: post.fileName
+        }
+        return firebase
+            .firestore()
+            .collection('posts')
+            .doc(uploadData.id)
+            .set(uploadData).then((resp) => {
+                alert('post uploaded success');
+
+                console.log("post:", resp)
+            }).catch((error) => {
+                console.log("error---", error)
+            })
+    }
+
+
+    uploadUserPost(response, mime = 'application/octet-stream') {
         return new Promise((resolve, reject) => {
             const uploadPath = Platform.OS === 'ios' ? response.uri.replace('file://', '') : response.path
             let uploadBlob = null
-
-            const imageRef = firebase.storage().ref('images').child('image_001.jpg')
+            const { uid } = this.props.user;
+            const { fileName } = response;
+            // return;
+            // const imageRef = firebase.storage().ref('profile_pictures').child('image_001.jpg')
+            const imageRef = firebase.storage().ref('user_posts').child(uid).child(fileName)
 
             fs.readFile(uploadPath, 'base64')
                 .then((data) => {
@@ -146,13 +162,48 @@ class EditProfile extends Component {
                     return imageRef.getDownloadURL()
                 })
                 .then((url) => {
-                    console.log("url----", url, this.props.user)
+                    console.log("urluploadPost----", url);
+                    let post = {
+                        photo: response.uri,
+                        postUrl: url,
+                        fileName: response.fileName,
+                        path: response.path
+                    }
+
+                    this.uploadPost(post);
+                    // resolve(url);
+                })
+                .catch((error) => {
+                    reject(error)
+                })
+        })
+    }
+
+    uploadImage(response, mime = 'application/octet-stream') {
+        return new Promise((resolve, reject) => {
+            const uploadPath = Platform.OS === 'ios' ? response.uri.replace('file://', '') : response.path
+            let uploadBlob = null
+            const { uid } = this.props.user;
+            const { fileName } = response;
+            // return;
+            // const imageRef = firebase.storage().ref('profile_pictures').child('image_001.jpg')
+            const imageRef = firebase.storage().ref('profile_pictures').child(uid).child(fileName)
+
+            fs.readFile(uploadPath, 'base64')
+                .then((data) => {
+                    return Blob.build(data, { type: `${mime};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.putFile(uploadPath)
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    console.log("url----", url)
                     resolve(url);
-                    const data = {
-                        displayName: 'name',
-                        displayImageUrl: url
-                    };
-                    this.props.updateUserProfile(data, this.props.user);
                 })
                 .catch((error) => {
                     reject(error)
@@ -183,18 +234,31 @@ class EditProfile extends Component {
                 const source = { uri: response.uri };
                 this.setState({ imagePickerResponse: response, image: source });
 
-                this.uploadImage(response)
-                    .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
-                    .catch(error => console.log("error occured: ", error))
+                if (false) {
+                    this.uploadImage(response)
+                        .then(url => {
+                            alert('Image uploaded');
+                            this.setState({ image_uri: url })
+                            const data = {
+                                displayName: this.props.user.name,
+                                displayImageUrl: url
+                            };
+                            this.props.updateUserProfile(data, this.props.user);
+                        }).catch(error => console.log("error occured: ", error))
+                } else {
+                    this.uploadUserPost(response)
+                        .then(url => {
+                            this.setState({ image_uri: url })
+                            const data = {
+                                displayName: this.props.user.name,
+                                displayImageUrl: url
+                            };
+                            this.props.updateUserProfile(data, this.props.user);
+                        }).catch(error => console.log("error occured: ", error))
+                }
             }
         });
     }
-
-    // handleUploadImage = () => {
-    //     this.uploadImage(this.state.imagePickerResponse)
-    //         .then(url => { alert('Image uploaded'); this.setState({ image_uri: url }) })
-    //         .catch(error => console.log("error occured: ", error))
-    // }
 
     render() {
         const uri = "https://facebook.github.io/react-native/docs/assets/favicon.png";
@@ -240,6 +304,7 @@ class EditProfile extends Component {
 }
 
 function mapStateToProps(state) {
+    console.log("updateduser: ", state.loginReducer.user);
     return {
         user: state.loginReducer.user,
     };

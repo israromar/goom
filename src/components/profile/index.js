@@ -209,6 +209,9 @@ class ProfileScreen extends React.Component {
             </View>
         );
     };
+    onChangeTab=()=>{
+        console.log("tab changed")
+    }
 
     render() {
         const { navigate } = this.props.navigation;
@@ -216,16 +219,13 @@ class ProfileScreen extends React.Component {
             <View style={styles.container}>
                 <Loader loading={this.state.loaded} text="Loading..." />
                 {this.renderHeader()}
-                <Tabs>
-                    <Tab heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
+                <Tabs hasTabs tabBarUnderlineStyle={{borderBottomWidth:0}} onChangeTab={() => this.onChangeTab()} scrollWithoutAnimation>
+                    <Tab heading="Popular" tabStyle={{backgroundColor: 'yellow'}} textStyle={{color: '#fff'}} activeTabStyle={{backgroundColor: 'red'}} activeTextStyle={{color: '#fff', fontWeight: 'normal'}} heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
                         <Posts />
                     </Tab>
                     <Tab initialPage heading={<TabHeading><Icon type="MaterialIcons" name="perm-contact-calendar" /></TabHeading>}>
                         <Tagged />
                     </Tab>
-                    {/* <Tab heading="Tab3">
-                        <Posts />
-                    </Tab> */}
                 </Tabs>
                 <FlatList
                     numColumns={3}

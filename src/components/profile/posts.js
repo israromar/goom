@@ -10,7 +10,7 @@ export default class Posts extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{ height:'100%', backgroundColor: 'red' }}>
         <Text> posts </Text>
       </View>
     );

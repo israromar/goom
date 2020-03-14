@@ -2,20 +2,68 @@
  * Reducer actions related with login
  */
 
-import firebase from 'react-native-firebase';
-
 import * as types from './actionTypes';
+import firebase from 'react-native-firebase';
 
 export function requestLogin(email, password) {
     return (dispatch, getState) => {
         dispatch({ type: types.LOGIN_REQUEST, email, password })
         firebase.auth()
             .signInWithEmailAndPassword(email, password)
-            .then((user) => {
+            .then(async (data) => {
+
+                let { _user } = data.user
+                console.log("userInfo: ", _user);
+                const { uid } = _user;
+
+                const userInfoRef = firebase.firestore().collection('users').doc(uid);
+                // const imageRef = firebase.storage().ref('profile_pictures').child(uid).child();
+
+                // firebase.firestore()
+                //     .collection('profile_pictures').child(uid)
+                //     .get()
+                //     .then(function (querySnapshot) {
+                //         let posts = querySnapshot.docs.map(doc => doc.data())
+                //         console.log("posts", posts)
+                //         return posts
+                //     })
+                //     .catch(function (error) {
+                //         console.log('Error getting documents: ', error)
+                //     })
+
+                // const url = await imageRef.getDownloadUrl();
+                // console.log("imageRef:", firebase.storage().ref());
+                // return;
+                // imageRef.get().then((image) => {
+                //     console.log("image: ", image);
+
+                // }).catch((error) => {
+                //     console.log("error here:", error)
+                // })
+                // return;
+
+                userInfoRef.get().then((doc) => {
+                    if (doc.exists) {
+                        console.log("document!", doc);
+                        const { _data } = doc;
+                        let user = {
+                            ..._user,
+                            userid: _data.userId,
+                            name: _data.name,
+                            username: _data.username,
+                            website: _data.website,
+                            bio: _data.bio,
+                        }
+
+                        if (user !== null) {
+                            dispatch({ type: types.LOGIN_RESPONSE, user: user })
+                        }
+                    } else {
+                        console.log("No such user exists!");
+                        dispatch({ type: types.LOGIN_FAILED, error: error })
+                    }
+                })
                 // navigate('Home')
-                if (user !== null) {
-                    dispatch({ type: types.LOGIN_RESPONSE, user: user.user._user })
-                }
             })
             .catch((error) => {
                 dispatch({ type: types.LOGIN_FAILED, error: error })

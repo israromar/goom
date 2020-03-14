@@ -10,7 +10,7 @@ export default class Tagged extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{ height:'100%', backgroundColor: 'green' }}>
         <Text> tagged </Text>
       </View>
     );
