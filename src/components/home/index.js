@@ -8,11 +8,17 @@ import {
     Alert,
     ScrollView,
     FlatList,
-    Button
+    Button,
+    Dimensions
 } from 'react-native';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { ActionCreators as actions } from '../../redux/actions/index';
+// import { requestLogin } from '../../redux/actions/loginActions';
+const { width, height } = Dimensions.get("window");
 import Icon from 'react-native-vector-icons/Ionicons';
 
-export default class HomePosts extends Component {
+class HomeFeed extends Component {
     static navigationOptions = {
         header: null,
     };
@@ -108,10 +114,20 @@ export default class HomePosts extends Component {
         };
     }
 
+    componentDidUpdate(preProps, preState) {
+        console.log("didupdateHome:", preProps, this.props)
+    }
+
+    handlePress = () => {
+        const { navigate } = this.props.navigation;
+        this.props.recommendedUsers();
+        // navigate('UsersList');
+    }
+
     render() {
         return (
             <View style={styles.container}>
-                <TouchableOpacity onPress={() => { this.props.navigation.navigate('UsersList'); }}>
+                <TouchableOpacity onPress={() => { this.handlePress() }}>
                     <Text style={{ backgroundColor: 'red', marginTop: 30 }}>See more</Text>
                 </TouchableOpacity>
                 <FlatList style={styles.list}
@@ -168,7 +184,7 @@ export default class HomePosts extends Component {
                             </View>
                         )
                     }} />
-            </View>
+            </View >
         );
     }
 }
@@ -267,3 +283,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     }
 });
+
+const mapStateToProps = state => {
+    console.log("recommedndedUser state:", state)
+    return {
+        user: state.userProfileReducer.user
+    }
+}
+
+const mapDispatchToProps = dispatch => (
+    bindActionCreators({ recommendedUsers: actions.recommendedUsers }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeFeed);

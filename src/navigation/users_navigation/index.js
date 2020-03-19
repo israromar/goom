@@ -13,7 +13,7 @@ const UsersNavigator = createStackNavigator({
         navigationOptions: ({ navigation }) => ({
             headerTitle: 'Edit Profile',
             headerShown: true,
-            headerLeft: () => <CustomeEditProfileHeader type={'left'} />,
+            headerLeft: () => <CustomeEditProfileHeader type={'left'} navigationProps={navigation} />,
             headerRight: () => <CustomeEditProfileHeader type={'right'} navigationProps={navigation} />
         })
     },
@@ -22,13 +22,20 @@ const UsersNavigator = createStackNavigator({
         navigationOptions: ({ navigation }) => ({
             headerTitle: 'Recommended users',
             headerShown: true,
-            headerLeft: () => (<MaterialIcon onPress={() => navigation.dismiss(null)} style={[styles.headerIcons, { marginVertical: 20 }]} name={'arrow-back'} size={25} />),
+            headerLeft: () => <MaterialIcon onPress={() => navigation.dismiss(null)} style={[styles.headerIcons, { marginVertical: 20 }]} name={'arrow-back'} size={25} />,
         })
     },
     UserProfile: {
         screen: Screens.UserProfileScreen,
         navigationOptions: {
             title: 'Profile',
+            // headerShown: false,
+        }
+    },
+    Posts: {
+        screen: Screens.PostScreen,
+        navigationOptions: {
+            title: 'Posts',
             // headerShown: false,
         }
     }

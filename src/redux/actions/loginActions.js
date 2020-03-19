@@ -4,83 +4,110 @@
 
 import * as types from './actionTypes';
 import firebase from 'react-native-firebase';
+import {
+    GoogleSignin,
+    GoogleSigninButton,
+    statusCodes,
+} from '@react-native-community/google-signin';
 
-export function requestLogin(email, password) {
-    return (dispatch, getState) => {
-        dispatch({ type: types.LOGIN_REQUEST, email, password })
-        firebase.auth()
-            .signInWithEmailAndPassword(email, password)
-            .then(async (data) => {
+export function requestLogin(email, password, signInFlag) {
+    return async (dispatch, getState) => {
+        dispatch({ type: types.LOGIN_REQUEST, email, password });
 
-                let { _user } = data.user
-                console.log("userInfo: ", _user);
-                const { uid } = _user;
+        if (signInFlag === 'email') {
+            firebase.auth()
+                .signInWithEmailAndPassword(email, password)
+                .then(async (data) => {
+                    let { _user } = data.user
+                    console.log("userInfo data: ", data);
+                    const { uid } = _user;
+                    const userInfoRef = firebase.firestore().collection('users').doc(uid);
+                    const userPostsRef = firebase.firestore().collection('users').doc(uid).collection('posts');
+                    // return;
+                    userInfoRef.get().then((doc) => {
+                        if (doc.exists) {
+                            console.log("user found:", doc);
+                            const { _data } = doc;
 
-                const userInfoRef = firebase.firestore().collection('users').doc(uid);
-                // const imageRef = firebase.storage().ref('profile_pictures').child(uid).child();
+                            let user = {
+                                ..._user,
+                                userid: _data.userId,
+                                name: _data.name,
+                                username: _data.username,
+                                website: _data.website,
+                                bio: _data.bio,
+                            }
+                            userPostsRef.get().then((posts) => {
+                                console.log("posts found:", posts)
 
-                // firebase.firestore()
-                //     .collection('profile_pictures').child(uid)
-                //     .get()
-                //     .then(function (querySnapshot) {
-                //         let posts = querySnapshot.docs.map(doc => doc.data())
-                //         console.log("posts", posts)
-                //         return posts
-                //     })
-                //     .catch(function (error) {
-                //         console.log('Error getting documents: ', error)
-                //     })
+                                user = {
+                                    ..._user,
+                                    userid: _data.userId,
+                                    name: _data.name,
+                                    username: _data.username,
+                                    website: _data.website,
+                                    bio: _data.bio,
+                                    posts: posts._docs
+                                }
 
-                // const url = await imageRef.getDownloadUrl();
-                // console.log("imageRef:", firebase.storage().ref());
-                // return;
-                // imageRef.get().then((image) => {
-                //     console.log("image: ", image);
-
-                // }).catch((error) => {
-                //     console.log("error here:", error)
-                // })
-                // return;
-
-                userInfoRef.get().then((doc) => {
-                    if (doc.exists) {
-                        console.log("document!", doc);
-                        const { _data } = doc;
-                        let user = {
-                            ..._user,
-                            userid: _data.userId,
-                            name: _data.name,
-                            username: _data.username,
-                            website: _data.website,
-                            bio: _data.bio,
+                                if (user !== null) {
+                                    dispatch({ type: types.USER_PROFILE_INFO, payload: user })
+                                }
+                            }).catch((error) => {
+                                console.log("error in posts:", error);
+                                dispatch({ type: types.USER_PROFILE_INFO, payload: user })
+                            })
+                        } else {
+                            console.log("No such user exists!");
+                            dispatch({ type: types.LOGIN_FAILED, payload: error })
                         }
-
-                        if (user !== null) {
-                            dispatch({ type: types.LOGIN_RESPONSE, user: user })
-                        }
-                    } else {
-                        console.log("No such user exists!");
-                        dispatch({ type: types.LOGIN_FAILED, error: error })
-                    }
+                    })
+                    // navigate('Home')
                 })
-                // navigate('Home')
-            })
-            .catch((error) => {
-                dispatch({ type: types.LOGIN_FAILED, error: error })
-                // Alert.alert("Email or password is incorrect!");
-                console.log("Email or password is incorrect!", error)
-            })
+                .catch((error) => {
+                    dispatch({ type: types.LOGIN_FAILED, payload: error })
+                    // Alert.alert("Email or password is incorrect!");
+                    console.log("Email or password is incorrect!", error)
+                })
+        } else {
+            const user = await signInWithGmail();
+            console.log("gmailuserObjhere: ", user)
+        }
     }
-    // return {
-    //     type: types.LOGIN_REQUEST,
-    //     email,
-    //     password
-    // };
 }
+
+const signInWithGmail = async () => {
+    try {
+        await GoogleSignin.hasPlayServices();
+        const user = await GoogleSignin.signIn();
+        console.log("myUser:", user)
+        return user;
+    } catch (error) {
+        if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+            // user cancelled the login flow
+        } else if (error.code === statusCodes.IN_PROGRESS) {
+            // operation (e.g. sign in) is in progress already
+        } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+            // play services not available or outdated
+        } else {
+            // some other error happened
+        }
+    }
+};
 
 export function requestLogout() {
     return (dispatch, getState) => {
         dispatch({ type: types.LOGOUT_REQUEST })
+        let user = {
+            isLoggedIn: false,
+            isLoginInitiated: false,
+            email: '',
+            password: '',
+            user: {},
+            isUserProfileUpdated: false
+        }
+        dispatch({ type: types.USER_PROFILE_INFO, payload: user })
+        dispatch({ type: types.UPDATE_USER_PROFILE_RESPONSE, payload: user })
     }
 }
 

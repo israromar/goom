@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Alert } from 'react-native';
 import { Container, Header, Footer, Title, Content, Button, List, ListItem, Text, Icon, Left, Body, Right, Switch } from 'native-base';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -36,11 +36,12 @@ class Menu extends Component {
                 console.error(error);
             }
         } else {
-            firebase.auth().signOut().then(() => {
-                this.props.requestLogout();
+            firebase.auth().signOut().then(async () => {
+                await this.props.requestLogout();
                 navigate('Auth');
             }).catch(error => {
                 console.log("error", error);
+                Alert.alert('Something went wrong while logging out.');
                 // navigate('Auth');
             })
         }

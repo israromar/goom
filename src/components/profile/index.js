@@ -7,6 +7,7 @@ import {
     FlatList,
     Image,
     Button,
+    TouchableHighlight,
     TouchableOpacity
 } from "react-native";
 import { Container, Thumbnail, Header, Content, Form, Item, Input, Label, Tab, Tabs, TabHeading, Icon, } from 'native-base';
@@ -33,34 +34,78 @@ class ProfileScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        // this.state={
-
-        // }
     }
     state = {
+        displayName: '',
+        username: '',
+        bio: '',
+        website: '',
         loaded: false,
         data: null,
-        profileImg: null,
-        displayName: ''
+        photoURL: null,
+        phoneNumber: null,
+        photoURL: "https://firebasestorage.googleapis.com/v0/b/goomapp-918e3.appspot.com/o/profile_pictures%2FNHaArgt7KcMkCGOQGXeKaBAcJoE3%2FIMG_20200314_011831.jpg?alt=media&token=1edf45c6-6656-4660-8b56-9335d90165e7",
+        email: "saim@gmail.com",
+        isAnonymous: false,
+        emailVerified: false,
+        providerId: "firebase",
+        uid: "NHaArgt7KcMkCGOQGXeKaBAcJoE3",
+        userid: "NHaArgt7KcMkCGOQGXeKaBAcJoE3",
+        name: "saim",
     };
 
-    componentDidMount() {
+    componentDidMount = async () => {
         // this.fetchFeed();
+        console.log("didmount profile:", this.props);
         if (this.props.user) {
+            const { displayName, username, uid, bio, website } = this.props.user;
             const source = { uri: this.props.user.photoURL }
             this.setState({
-                profileImg: source,
-                displayName: this.props.displayName
+                photoURL: source,
+                displayName, username, uid, bio, website
             })
+
+            let { posts } = this.props.user;
+            let postArr = [];
+            if (posts) {
+                posts.map((post) => {
+                    postArr.push(post._data)
+                })
+                this.setState({ data: postArr })
+            }
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        console.log("profildidupdate:", this.props.user)
+
+        if (prevProps.isSideMenuOpen !== this.props.isSideMenuOpen) {
+            this.props.toggleSideMenu();
+        }
+        if (prevProps.user !== this.props.user) {
+            console.log("indidupdateafter post:", this.props.user)
+            const { displayName, username, uid, bio, website } = this.props.user;
+            const source = { uri: this.props.user.photoURL }
+
+            let { posts } = this.props.user;
+            let postArr = [];
+            if (posts) {
+                posts.map((post) => {
+                    postArr.push(post._data)
+                })
+            }
+            this.setState({
+                photoURL: source,
+                displayName, username, uid, bio, website,
+                data: postArr
+            })
+        }
+    }
     isSignedInWithGmail = async () => {
         const flag = await GoogleSignin.isSignedIn();
         return flag;
         // this.setState({ isLoginScreenPresented: !isSignedIn });
     };
-
 
     handleSignout = async () => {
         const { navigate } = this.props.navigation;
@@ -109,22 +154,9 @@ class ProfileScreen extends React.Component {
         await this.setState({
             loaded: false,
             data: posts.data,
-            profileImg: img
+            photoURL: img
         });
         this.renderHeader();
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.isSideMenuOpen !== this.props.isSideMenuOpen) {
-            this.props.toggleSideMenu();
-        }
-        if (prevProps.user !== this.props.user) {
-            const source = { uri: this.props.user.photoURL }
-            this.setState({
-                profileImg: source,
-                displayName: this.props.displayName
-            })
-        }
     }
 
     handleEditProfile = () => {
@@ -133,15 +165,16 @@ class ProfileScreen extends React.Component {
     }
 
     renderHeader = () => {
-        const imageUrl = this.state.profileImg;
+        console.log("this.state", this.state)
+        const imageUrl = this.state.photoURL;
         return (
             <View>
                 <View style={{ padding: 20, flexDirection: "row" }}>
                     <View style={[styles.profileImage], { backgroundColor: 'none' }}>
-                        <Thumbnail style={styles.profileImage} large source={this.state.profileImg ? this.state.profileImg : avatar} />
-                        <Text>Israr Khan</Text>
-                        <Text>pk</Text>
-                        <Text>Softech</Text>
+                        <Thumbnail style={styles.profileImage} large source={this.state.photoURL.uri ? this.state.photoURL : avatar} />
+                        <Text>{this.state.displayName}</Text>
+                        <Text>{this.state.bio}</Text>
+                        <Text>{this.state.website}</Text>
                     </View>
                     <View
                         style={{
@@ -166,16 +199,6 @@ class ProfileScreen extends React.Component {
                             </View>
                         </View>
                     </View>
-                    {/* <View style={{
-                        flex: 1,
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'stretch',
-                    }}>
-                        <View style={{ width: 50, height: 50, backgroundColor: 'powderblue' }} />
-                        <View style={{ height: 50, backgroundColor: 'skyblue' }} />
-                        <View style={{ height: 100, backgroundColor: 'steelblue' }} />
-                    </View> */}
                 </View>
                 <TouchableOpacity onPress={this.handleEditProfile} >
                     <View
@@ -186,6 +209,7 @@ class ProfileScreen extends React.Component {
                             width: "100%",
                             marginLeft: 0,
                             alignItems: "center",
+                            justifyContent: "center",
                             backgroundColor: 'none'
                         }}
                     >
@@ -196,20 +220,28 @@ class ProfileScreen extends React.Component {
         );
     };
 
-    renderItem = (postInfo, index) => {
-        const imageUri = postInfo.images.standard_resolution.url;
+    handleNavigation = (postInfo) => {
+        this.props.navigation.navigate('Posts', { postInfo })
+    }
 
+    renderItem = (postInfo, index) => {
+        const imageUri = postInfo.postUrl;
+        console.log("postInfo", postInfo.postUrl)
+        // return;
         return (
             <View style={styles.gridImgContainer}>
-                <Image
-                    resizeMode="cover"
-                    style={styles.image}
-                    source={{ uri: imageUri }}
-                />
+                {/* <Thumbnail style={styles.profileImage} large source={this.state.photoURL ? { uri: imageUri } : avatar} /> */}
+                <TouchableHighlight onPress={() => this.handleNavigation(postInfo)}>
+                    <Image
+                        resizeMode="cover"
+                        style={styles.image}
+                        source={{ uri: imageUri }}
+                    />
+                </TouchableHighlight>
             </View>
         );
     };
-    onChangeTab=()=>{
+    onChangeTab = () => {
         console.log("tab changed")
     }
 
@@ -219,14 +251,14 @@ class ProfileScreen extends React.Component {
             <View style={styles.container}>
                 <Loader loading={this.state.loaded} text="Loading..." />
                 {this.renderHeader()}
-                <Tabs hasTabs tabBarUnderlineStyle={{borderBottomWidth:0}} onChangeTab={() => this.onChangeTab()} scrollWithoutAnimation>
-                    <Tab heading="Popular" tabStyle={{backgroundColor: 'yellow'}} textStyle={{color: '#fff'}} activeTabStyle={{backgroundColor: 'red'}} activeTextStyle={{color: '#fff', fontWeight: 'normal'}} heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
+                {/* <Tabs hasTabs tabBarUnderlineStyle={{ borderBottomWidth: 0 }} onChangeTab={() => this.onChangeTab()} scrollWithoutAnimation>
+                    <Tab heading="Popular" tabStyle={{ backgroundColor: 'yellow' }} textStyle={{ color: '#fff' }} activeTabStyle={{ backgroundColor: 'red' }} activeTextStyle={{ color: '#fff', fontWeight: 'normal' }} heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
                         <Posts />
                     </Tab>
                     <Tab initialPage heading={<TabHeading><Icon type="MaterialIcons" name="perm-contact-calendar" /></TabHeading>}>
                         <Tagged />
                     </Tab>
-                </Tabs>
+                </Tabs> */}
                 <FlatList
                     numColumns={3}
                     data={this.state.data}
@@ -258,18 +290,13 @@ const styles = StyleSheet.create({
     image: {
         height: width * 0.33,
         width: width * 0.33,
-        // width: width * 0.2,
-        // height: width * 0.2,
-        // borderRadius: width * 0.5,
-        // borderWidth: 1,
-        // marginRight: 10
     }
 });
 
 const mapStateToProps = state => {
     return {
         isSideMenuOpen: state.sideMenuReducer.isSideMenuOpen,
-        user: state.loginReducer.user
+        user: state.userProfileReducer.user
     }
 }
 

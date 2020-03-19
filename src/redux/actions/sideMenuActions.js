@@ -6,6 +6,6 @@ import * as types from './actionTypes';
 export function toggleSideMenu(flag) {
     return {
         type: types.TOGGLE_SIDE_MENU,
-        flag
+        payload: flag
     };
 }

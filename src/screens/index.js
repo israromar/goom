@@ -7,6 +7,7 @@ import SearchScreen from './search';
 import AddMediaScreen from './add_media';
 import NotificationsScreen from './notifications';
 import ProfileScreen from './profile';
+import PostScreen from './posts';
 import EditProfileScreen from './edit_profile';
 import UsersListScreen from './users_list';
 import UserProfileScreen from './user_profile';
@@ -24,6 +25,7 @@ const screens = {
     AddMediaScreen,
     NotificationsScreen,
     ProfileScreen,
+    PostScreen,
     EditProfileScreen,
     MapScreen,
     ChatUserListScreen,

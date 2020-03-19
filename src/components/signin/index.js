@@ -25,7 +25,6 @@ import colors from '../../styles/colors';
 import { EmailEnvelopeOne, PasswordKey } from '../../assets';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { requestLogin } from '../../redux/actions/loginActions';
 import { ActionCreators as actions } from '../../redux/actions';
 
 class LoginView extends Component {
@@ -46,19 +45,32 @@ class LoginView extends Component {
 
     componentDidMount = async () => {
         const { navigate } = this.props.navigation;
-        console.log("await GoogleSignin.isSignedIn()", await GoogleSignin.isSignedIn());
         if (await GoogleSignin.isSignedIn()) {
             navigate('Home');
+        } else {
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    // User is signed in.
+                    navigate('Home');
+                } else {
+                    // No user is signed in.
+                    navigate('SignIn');
+                }
+            });
         }
-    };
+    }
 
     componentDidUpdate(prevProps, prevState) {
         const { navigate } = this.props.navigation;
-
+        console.log("signedInUser:", this.props);
+        if (prevProps.login !== this.props.login) {
+            if (this.props.login.loginError && !this.props.login.isLoggedIn) {
+                Alert.alert(this.props.login.loginError.code);
+            }
+        }
         if (prevProps.user !== this.props.user && Object.entries(this.props.user).length > 0 && this.props.user.constructor === Object) {
             navigate('Home');
         }
-
         if (prevState.userInfo !== this.state.userInfo) {
             if (this.state.userInfo) {
                 navigate('Home');
@@ -87,14 +99,18 @@ class LoginView extends Component {
             })
     };
 
-    onClickListener = async (viewId) => {
+    onClickListener = async (viewId, signInFlag) => {
         const { navigate } = this.props.navigation;
         if (viewId === 'login') {
-            if (this.state.email && this.state.password) {
-                // this.handleLogin();
-                this.props.requestLogin(this.state.email, this.state.password);
+            if (signInFlag === 'email') {
+                if (this.state.email && this.state.password) {
+                    // this.handleLogin();
+                    this.props.requestLogin(this.state.email, this.state.password, signInFlag);
+                } else {
+                    Alert.alert("Enter email and password!");
+                }
             } else {
-                Alert.alert("Enter email and password!");
+                this.props.requestLogin(null, null, signInFlag);
             }
         } else if (viewId === 'signin_phone') {
             navigate('PhoneAuth');
@@ -105,23 +121,23 @@ class LoginView extends Component {
         }
     };
 
-    signIn = async () => {
-        try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            this.setState({ userInfo });
-        } catch (error) {
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                // play services not available or outdated
-            } else {
-                // some other error happened
-            }
-        }
-    };
+    // signIn = async () => {
+    //     try {
+    //         await GoogleSignin.hasPlayServices();
+    //         const userInfo = await GoogleSignin.signIn();
+    //         this.setState({ userInfo });
+    //     } catch (error) {
+    //         if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //             // user cancelled the login flow
+    //         } else if (error.code === statusCodes.IN_PROGRESS) {
+    //             // operation (e.g. sign in) is in progress already
+    //         } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //             // play services not available or outdated
+    //         } else {
+    //             // some other error happened
+    //         }
+    //     }
+    // };
 
     render() {
         return (
@@ -149,7 +165,7 @@ class LoginView extends Component {
                 </View>
 
                 <TouchableHighlight style={[styles.buttonContainer, styles.loginButton]}
-                    onPress={() => this.onClickListener('login')}>
+                    onPress={() => this.onClickListener('login', 'email')}>
                     <Text style={styles.loginText}>Login</Text>
                 </TouchableHighlight>
 
@@ -157,7 +173,7 @@ class LoginView extends Component {
                     style={{ width: 192, height: 48 }}
                     size={GoogleSigninButton.Size.Wide}
                     color={GoogleSigninButton.Color.Dark}
-                    onPress={this.signIn}
+                    onPress={() => this.onClickListener('login', 'gmail')}
                     disabled={this.state.isSigninInProgress} />
 
                 <TouchableHighlight style={styles.buttonContainer}
@@ -240,6 +256,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        login: state.loginReducer,
         loginStatus: state.loginReducer.isLoggedIn,
         user: state.loginReducer.user,
         email: state.loginReducer.email,
@@ -250,7 +267,6 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = dispatch => (
     bindActionCreators({ requestLogin: actions.requestLogin }, dispatch)
-    // bindActionCreators({ requestLogin }, dispatch)
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginView);

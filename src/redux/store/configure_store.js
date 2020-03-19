@@ -1,6 +1,7 @@
 import { createStore, compose, applyMiddleware } from 'redux';
-import { persistStore, persistCombineReducers } from 'redux-persist';
+import { createTransform, persistStore, persistCombineReducers } from 'redux-persist';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import JSOG from 'jsog'
 
 // import storage from 'redux-persist/es/storage'; // default: localStorage if web, AsyncStorage if react-native
 // import AsyncStorage from '@react-native-community/async-storage';
@@ -11,11 +12,16 @@ import thunk from 'redux-thunk';
 import { rootReducer } from '../reducers'; // where reducers is a object of reducers
 // import sagas from 'src/sagas';
 
+export const JSOGTransform = createTransform(
+    (inboundState, key) => JSOG.encode(inboundState),
+    (outboundState, key) => JSOG.decode(outboundState),
+)
 const config = {
     key: 'root',
     storage: AsyncStorage,
     blacklist: [''],
-    debug: true //to get useful logging
+    debug: true, //to get useful logging,
+    transforms: [JSOGTransform]
 };
 
 // const rootReducers = {

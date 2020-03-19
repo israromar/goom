@@ -8,7 +8,7 @@ class AddMediaScreen extends Component {
 
     render() {
         return (
-            <DataForm {...this.props} />
+            <AddMediaComponent {...this.props} />
         );
     }
 }

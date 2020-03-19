@@ -41,13 +41,22 @@ SearchStack.navigationOptions = ({ navigation }) => {
 
 const AddMediaStack = createStackNavigator({
     AddMediaScreen: {
-        screen: Screens.AddMediaScreen
+        screen: Screens.AddMediaScreen,
+        navigationOptions: {
+            headerShown: false
+        }
     }
 });
 
 const NotificationStack = createStackNavigator({
     NotificationScreen: {
         screen: Screens.NotificationsScreen
+    }
+});
+
+const PostStack = createStackNavigator({
+    PostScreen: {
+        screen: Screens.PostScreen
     }
 });
 

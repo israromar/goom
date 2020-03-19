@@ -10,20 +10,12 @@ import {
     Alert,
     ActivityIndicator
 } from 'react-native';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
+import { ActionCreators as actions } from '../../redux/actions';
 
 const SignUp = (props) => {
-
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         name: '',
-    //         email: '',
-    //         password: '',
-    //     }
-    // }
-
-    const [userId, setUserId] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,28 +24,41 @@ const SignUp = (props) => {
     const insertUserDataToFireStore = (userId) => {
         const { navigate } = props.navigation;
         firebase.firestore().doc('users/' + userId).set({
-            userId: userId,
-            name: name,
-            email: email
+            uid: userId,
+            name,
+            email
         }).then(user => {
+            console.log('signup props:', props)
+            props.requestLogin(email, password, 'email');
             navigate('Home');
+
         }).catch(error => {
             console.log("error:", error);
         })
     }
-    
+
     const register = async () => {
-        const { navigate } = props.navigation;
         setShowLoading(true);
         try {
             const doRegister = await firebase.auth().createUserWithEmailAndPassword(email, password);
             setShowLoading(false);
             if (doRegister.user) {
-                // setUserId();
-                insertUserDataToFireStore(doRegister.user._user.uid);
-                // setName(name);
-                // setEmail(email);
-                // navigate('Home');
+
+                let updateDisplayName = {
+                    displayName: name
+                }
+
+                firebase.auth().onAuthStateChanged(currentUser => {
+                    currentUser
+                        .updateProfile(updateDisplayName)
+                        .then(() => firebase.auth().currentUser)
+                        .then(user => {
+                            insertUserDataToFireStore(doRegister.user._user.uid, email, password);
+                        }).catch((error) => {
+                            insertUserDataToFireStore(doRegister.user._user.uid, email, password);
+                        })
+                })
+
             }
         } catch (e) {
             setShowLoading(false);
@@ -131,17 +136,9 @@ const SignUp = (props) => {
     );
 }
 
-export default SignUp;
-
 const resizeMode = 'cover';
 
 const styles = StyleSheet.create({
-
-    // container: {
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    // },
     formContainer: {
         height: 400,
         padding: 20
@@ -263,3 +260,15 @@ const styles = StyleSheet.create({
         textShadowRadius: 10
     }
 });
+
+function mapStateToProps(state) {
+    return {
+        user: state.loginReducer.user
+    };
+}
+
+const mapDispatchToProps = dispatch => (
+    bindActionCreators({ requestLogin: actions.requestLogin }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

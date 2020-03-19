@@ -1,0 +1,24 @@
+   // const imageRef = firebase.storage().ref('profile_pictures').child(uid).child();
+
+                    // firebase.firestore()
+                    //     .collection('profile_pictures').child(uid)
+                    //     .get()
+                    //     .then(function (querySnapshot) {
+                    //         let posts = querySnapshot.docs.map(doc => doc.data())
+                    //         console.log("posts", posts)
+                    //         return posts
+                    //     })
+                    //     .catch(function (error) {
+                    //         console.log('Error getting documents: ', error)
+                    //     })
+
+                    // const url = await imageRef.getDownloadUrl();
+                    // console.log("imageRef:", firebase.storage().ref());
+                    // return;
+                    // imageRef.get().then((image) => {
+                    //     console.log("image: ", image);
+
+                    // }).catch((error) => {
+                    //     console.log("error here:", error)
+                    // })
+                    // return;

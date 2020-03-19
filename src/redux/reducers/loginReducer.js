@@ -10,7 +10,8 @@ const initialState = {
     isLoginInitiated: false,
     email: '',
     password: '',
-    user: {}
+    user: {},
+    loginError: '',
 };
 
 const loginReducer = (state = initialState, action) => {
@@ -27,13 +28,16 @@ const loginReducer = (state = initialState, action) => {
                 ...state,
                 isLoggedIn: true,
                 isLoginInitiated: false,
-                user: action.user
+                user: action.user,
+                loginError: ''
             }
         case actionTypes.LOGIN_FAILED:
             return {
                 ...state,
-                isLoggedIn: true,
-                isLoginInitiated: false
+                isLoggedIn: false,
+                isLoginInitiated: false,
+                user: {},
+                loginError: action.payload
             }
         case actionTypes.LOGOUT_REQUEST:
             return {

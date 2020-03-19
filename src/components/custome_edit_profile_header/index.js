@@ -13,6 +13,16 @@ class CustomEditProfileHeader extends React.Component {
         }
     }
 
+    handlePress = async (flag) => {
+        console.log("flag:", flag, this.props);
+        if (flag === 'cross') {
+            this.props.navigationProps.dismiss();
+        } else {
+            console.log("check:", this.props);
+            this.props.updateUserProfile(null, this.props.user);
+        }
+    }
+
     render() {
         return (
             <View
@@ -26,8 +36,8 @@ class CustomEditProfileHeader extends React.Component {
                     flexDirection: 'row',
                     justifyContent: 'space-between'
                 }]}>
-                    {this.props.type === 'left' && <AntDesignIcon onPress={() => console.log("on cancel press: ", this.props)} style={[styles.headerIcons]} name={'close'} size={29} />}
-                    {this.props.type === 'right' && <AntDesignIcon onPress={() => console.log("on check press: ", this.props)} style={[styles.headerIcons]} color="blue" name={'check'} size={25} />}
+                    {this.props.type === 'left' && <AntDesignIcon onPress={() => this.handlePress('cross')} style={[styles.headerIcons]} name={'close'} size={29} />}
+                    {this.props.type === 'right' && <AntDesignIcon onPress={() => this.handlePress('check')} style={[styles.headerIcons]} color="blue" name={'check'} size={25} />}
                 </View>
             </View>
         );
@@ -104,12 +114,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
+        user: state.loginReducer.user
         // isSideMenuOpen: state.sideMenuReducer.isSideMenuOpen
     }
 }
 
 const mapDispatchToProps = dispatch => (
-    bindActionCreators({ toggleSideMenu: actions.toggleSideMenu }, dispatch)
+    bindActionCreators({ updateUserProfile: actions.updateUserProfile }, dispatch)
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomEditProfileHeader);
