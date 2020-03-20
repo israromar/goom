@@ -41,6 +41,7 @@ class Posts extends Component {
     //         console.log("didupdatetwo: ", this.props.navigation)
     //     }
     // }
+    
     render() {
         return (
             <Container>

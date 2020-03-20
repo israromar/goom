@@ -32,7 +32,7 @@ const UsersNavigator = createStackNavigator({
             // headerShown: false,
         }
     },
-    Posts: {
+    Postsone: {
         screen: Screens.PostScreen,
         navigationOptions: {
             title: 'Posts',

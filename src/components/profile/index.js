@@ -251,20 +251,20 @@ class ProfileScreen extends React.Component {
             <View style={styles.container}>
                 <Loader loading={this.state.loaded} text="Loading..." />
                 {this.renderHeader()}
-                {/* <Tabs hasTabs tabBarUnderlineStyle={{ borderBottomWidth: 0 }} onChangeTab={() => this.onChangeTab()} scrollWithoutAnimation>
-                    <Tab heading="Popular" tabStyle={{ backgroundColor: 'yellow' }} textStyle={{ color: '#fff' }} activeTabStyle={{ backgroundColor: 'red' }} activeTextStyle={{ color: '#fff', fontWeight: 'normal' }} heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
-                        <Posts />
+                <Tabs hasTabs tabBarUnderlineStyle={{ borderBottomWidth: 0 }} onChangeTab={() => this.onChangeTab()} scrollWithoutAnimation>
+                    <Tab heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
+                        <Posts data={this.state.data && this.state.data} renderItem={this.renderItem} />
                     </Tab>
-                    <Tab initialPage heading={<TabHeading><Icon type="MaterialIcons" name="perm-contact-calendar" /></TabHeading>}>
+                    <Tab heading={<TabHeading><Icon type="MaterialIcons" name="perm-contact-calendar" /></TabHeading>}>
                         <Tagged />
                     </Tab>
-                </Tabs> */}
-                <FlatList
+                </Tabs>
+                {/* <FlatList
                     numColumns={3}
                     data={this.state.data}
                     renderItem={({ item, index }) => this.renderItem(item, index)}
                     keyExtractor={item => item.id}
-                />
+                /> */}
             </View>
         );
     }

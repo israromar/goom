@@ -69,8 +69,13 @@ const ProfileStack = createStackNavigator({
             headerLeft: () => <CustomProfileHeader type={'left'} />,
             headerRight: () => <CustomProfileHeader type={'right'} navigationProps={navigation} />
         })
-    }
-});
+    },
+    Posts: {
+        screen: Screens.PostScreen
+    },
+
+}, { initialRouteName: 'ProfileScreen' })
+
 
 const getTabBarIcon = (navigation, focused, tintColor) => {
     const { routeName } = navigation.state;
@@ -134,6 +139,19 @@ const BottomTabNavigation = createBottomTabNavigator(
         }
     }
 )
+
+const newBottomNav = createStackNavigator({
+    bottomNav: {
+        screen: BottomTabNavigation
+    },
+    posts: {
+        screen: PostStack,
+        navigationOptions: {
+
+        }
+    }
+})
+
 
 const App = createAppContainer(BottomTabNavigation);
 export default App;
