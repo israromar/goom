@@ -29,6 +29,7 @@ import { ActionCreators as actions } from '../../redux/actions/index';
 const { width, height } = Dimensions.get("window");
 const accessToken = "3037519972.1677ed0.52a14a1505524e469810bbd082331214";
 import avatar from '../../assets/images/avatar7.png';
+import { DataTableIcon, TagPostIcon } from '../../assets/images';
 
 class ProfileScreen extends React.Component {
 
@@ -36,6 +37,7 @@ class ProfileScreen extends React.Component {
         super(props);
     }
     state = {
+        activeTabIndex: 0,
         displayName: '',
         username: '',
         bio: '',
@@ -165,55 +167,54 @@ class ProfileScreen extends React.Component {
     }
 
     renderHeader = () => {
-        console.log("this.state", this.state)
+        console.log("this.state.data", this.state)
         const imageUrl = this.state.photoURL;
         return (
-            <View>
-                <View style={{ padding: 20, flexDirection: "row" }}>
-                    <View style={[styles.profileImage], { backgroundColor: 'none' }}>
-                        <Thumbnail style={styles.profileImage} large source={this.state.photoURL.uri ? this.state.photoURL : avatar} />
+            <View style={{ marginBottom: 20 }}>
+                <View style={{ padding: 10 }}>
+                    <View style={{ flexDirection: 'row', backgroundColor: 'none' }}>
+                        <View style={{ paddingTop: 5, backgroundColor: 'none' }}>
+                            <Thumbnail style={styles.profileImage} large source={this.state.photoURL.uri ? this.state.photoURL : avatar} />
+                        </View>
+                        <View style={{ flex: 1, marginLeft: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', backgroundColor: 'none' }}>
+                            <View style={{ alignItems: "center" }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{this.state.data && this.state.data.length}</Text>
+                                <Text style={{ fontSize: 13, fontWeight: 'simple' }}>Posts</Text>
+                            </View>
+                            <View style={{ alignItems: "center" }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>12</Text>
+                                <Text style={{ fontSize: 13, fontWeight: 'simple' }}>Followers</Text>
+                            </View>
+                            <View style={{ alignItems: "center" }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>203</Text>
+                                <Text style={{ fontSize: 13, fontWeight: 'simple' }}>Following</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={{ backgroundColor: 'none', marginVertical: 10 }}>
                         <Text>{this.state.displayName}</Text>
                         <Text>{this.state.bio}</Text>
                         <Text>{this.state.website}</Text>
                     </View>
-                    <View
-                        style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            padding: 5
-                        }}
-                    >
-                        <View style={{ flexDirection: "row", flex: 1 }}>
-                            <View style={{ flex: 1, alignItems: "center" }}>
-                                <Text>39</Text>
-                                <Text>Posts</Text>
-                            </View>
-                            <View style={{ flex: 1, alignItems: "center" }}>
-                                <Text>329</Text>
-                                <Text>followers</Text>
-                            </View>
-                            <View style={{ flex: 1, alignItems: "center" }}>
-                                <Text>593</Text>
-                                <Text>following</Text>
-                            </View>
-                        </View>
-                    </View>
                 </View>
-                <TouchableOpacity onPress={this.handleEditProfile} >
+                <TouchableOpacity style={{
+                    alignItems: 'center',
+                }} onPress={this.handleEditProfile} >
                     <View
                         style={{
-                            borderWidth: 1,
-                            height: 30,
-                            borderRadius: 10,
-                            width: "100%",
+                            borderWidth: 0.5,
+                            height: 29,
+                            borderRadius: 5,
+                            width: "95%",
                             marginLeft: 0,
                             alignItems: "center",
                             justifyContent: "center",
-                            backgroundColor: 'none'
+                            backgroundColor: 'none',
+                            borderColor: 'grey',
                         }}
                     >
-                        <Text>Edit Profile</Text>
+                        <Text style={{ fontSize: 13, fontWeight: 'simple' }}>Edit Profile</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -226,8 +227,6 @@ class ProfileScreen extends React.Component {
 
     renderItem = (postInfo, index) => {
         const imageUri = postInfo.postUrl;
-        console.log("postInfo", postInfo.postUrl)
-        // return;
         return (
             <View style={styles.gridImgContainer}>
                 {/* <Thumbnail style={styles.profileImage} large source={this.state.photoURL ? { uri: imageUri } : avatar} /> */}
@@ -241,30 +240,34 @@ class ProfileScreen extends React.Component {
             </View>
         );
     };
-    onChangeTab = () => {
-        console.log("tab changed")
+
+    onChangeTab = (index) => {
+        console.log("tab changed", index)
+        this.setState({ activeTabIndex: index })
     }
 
     render() {
-        const { navigate } = this.props.navigation;
         return (
             <View style={styles.container}>
                 <Loader loading={this.state.loaded} text="Loading..." />
                 {this.renderHeader()}
-                <Tabs hasTabs tabBarUnderlineStyle={{ borderBottomWidth: 0 }} onChangeTab={() => this.onChangeTab()} scrollWithoutAnimation>
-                    <Tab heading={<TabHeading><Icon type="FontAwesome" name="table" /></TabHeading>}>
-                        <Posts data={this.state.data && this.state.data} renderItem={this.renderItem} />
+                <Tabs tabBarUnderlineStyle={{ borderBottomWidth: 1 }} hasTabs onChangeTab={({ i }) => this.onChangeTab(i)} scrollWithoutAnimation>
+                    <Tab activeTabStyle={{ backgroundColor: 'red' }} activeTextStyle={{ color: 'red' }}
+                        heading={<TabHeading style={{ backgroundColor: '#fff' }}>
+                            <DataTableIcon fill={this.state.activeTabIndex === 0 ? '#000000' : 'grey'} style={{ marginTop: 10, strokeWidth: 3, stroke: this.state.activeTabIndex === 0 ? '#000000' : 'grey' }} width={45} height={45} />
+                            {/* <Icon type="FontAwesome" name="table" style={{ color: this.state.activeTabIndex === 0 ? 'black' : 'grey' }} /> */}
+
+                        </TabHeading>}>
+                        <Posts {...this.props} data={this.state.data && this.state.data} renderItem={this.renderItem} />
                     </Tab>
-                    <Tab heading={<TabHeading><Icon type="MaterialIcons" name="perm-contact-calendar" /></TabHeading>}>
+                    <Tab heading={
+                        <TabHeading style={{ backgroundColor: '#fff' }}>
+                            <TagPostIcon fill={this.state.activeTabIndex === 1 ? '#000000' : 'grey'} style={{ marginTop: 10, strokeWidth: 3, stroke: this.state.activeTabIndex === 1 ? '#000000' : 'grey' }} width={45} height={50} />
+                            {/* <Icon type="MaterialIcons" name="perm-contact-calendar" style={{ color: this.state.activeTabIndex === 1 ? 'black' : 'grey' }} /> */}
+                        </TabHeading>}>
                         <Tagged />
                     </Tab>
                 </Tabs>
-                {/* <FlatList
-                    numColumns={3}
-                    data={this.state.data}
-                    renderItem={({ item, index }) => this.renderItem(item, index)}
-                    keyExtractor={item => item.id}
-                /> */}
             </View>
         );
     }
@@ -273,7 +276,8 @@ class ProfileScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
+        marginTop: -10
     },
 
     gridImgContainer: {

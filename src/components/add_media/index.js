@@ -192,7 +192,6 @@ class AddMedia extends Component {
 }
 
 const styles = StyleSheet.create({
-
     activity: {
         position: 'absolute',
         left: 0,

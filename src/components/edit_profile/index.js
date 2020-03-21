@@ -7,7 +7,8 @@ import {
     Text,
     Platform,
     TouchableOpacity,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import { Container, Button, Thumbnail, Header, Body, Title, Left, Right, Content, Form, Item, Icon, Input, Label } from 'native-base';
 // import uuid from 'uuid';
@@ -53,6 +54,7 @@ class EditProfile extends Component {
             username: '',
             website: '',
             bio: '',
+            showLoading: false,
             isLoginInitiated: false,
             loading: false,
             image: null,
@@ -211,13 +213,13 @@ class EditProfile extends Component {
                 // You can also display the image using data:
                 // let image_uri = { uri: 'data:image/jpeg;base64,' + response.data };
                 const source = { uri: response.uri };
-                this.setState({ imagePickerResponse: response, image: source });
+                this.setState({ showLoading: true, imagePickerResponse: response, photoURL: source });
 
                 if (true) {
                     this.uploadImage(response)
                         .then(url => {
-                            alert('Image uploaded');
-                            this.setState({ image_uri: url })
+                            alert('Display picture updated');
+                            this.setState({ showLoading: false, image_uri: url })
                             const data = {
                                 displayName: this.props.user.name,
                                 photoURL: url
@@ -244,9 +246,22 @@ class EditProfile extends Component {
     }
 
     render() {
+        console.log("photo0000000000000", this.state)
         const uri = "https://facebook.github.io/react-native/docs/assets/favicon.png";
         return (
             <Container>
+
+                {this.state.showLoading &&
+                    <View style={styles.activity}>
+                        <View style={{
+                            display: 'flex', alignItems: 'center', borderRadius: 10, position: 'absolute', zIndex: 1,
+                            justifyContent: 'center', width: 250, height: 150, backgroundColor: 'grey', opacity: 0.9
+                        }}>
+                            <ActivityIndicator Text="loading" size="large" color="white" />
+                            <Text style={{ color: 'white', marginTop: 15 }}>Updating profile picture...</Text>
+                        </View>
+                    </View>
+                }
                 <Content>
                     <View style={{
                         flex: 1,
@@ -284,6 +299,19 @@ class EditProfile extends Component {
         );
     }
 }
+
+
+const styles = StyleSheet.create({
+    activity: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
+    }
+})
 
 function mapStateToProps(state) {
     return {

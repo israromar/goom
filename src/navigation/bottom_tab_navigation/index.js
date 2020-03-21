@@ -8,6 +8,18 @@ import FeatherIcons from 'react-native-vector-icons/Feather';
 import Screens from '../../screens';
 import CustomHomeHeader from '../../components/custome_home_header';
 import CustomProfileHeader from '../../components/custome_profile_header';
+import {
+    HomeIcon,
+    SearchIcon,
+    SearchIconOne,
+    SearchIconFilledOne,
+    AddIcon,
+    HeartIcon,
+    HeartIconOne,
+    HeartIconFilled,
+    HeartIconFilledOne,
+    UserIcon,
+} from '../../assets/images';
 
 const HomeStack = createStackNavigator({
     HomeScreen: {
@@ -118,15 +130,22 @@ const BottomTabNavigation = createBottomTabNavigator(
                 let iconName;
                 if (routeName === 'Home') {
                     iconName = 'home'
+                    return <HomeIcon style={{ strokeWidth: 3.5, stroke: "#000000" }} fill={focused ? 'black' : 'transparent'} width={45} height={45} />
                 } else if (routeName === 'Search') {
                     iconName = 'search'
+                    return focused ? <SearchIconFilledOne style={{ strokeWidth: 0, stroke: "#000000" }} width={31} height={31} />
+                        : <SearchIconOne style={{ strokeWidth: 0, stroke: "#000000" }} width={31} height={31} />
                 } else if (routeName === 'AddMedia') {
                     iconName = 'plus-square'
+                    return <AddIcon style={{ strokeWidth: 3.5, stroke: "#000000" }} fill={focused ? 'black' : 'transparent'} width={40} height={40} />
                 } else if (routeName === 'Notifications') {
                     iconName = 'heart'
+                    return focused ? <HeartIconFilledOne style={{ strokeWidth: 1, stroke: "#000000" }} width={30} height={30} />
+                        : <HeartIconOne style={{ strokeWidth: 4, stroke: "#000000" }} width={30} height={30} />
+
                 } else if (routeName === 'Profile') {
-                    // iconName = focused ? 'ios-list-box' : 'ios-list';
                     iconName = 'user'
+                    return <UserIcon style={{ strokeWidth: 3, stroke: "#000000" }} fill={focused ? 'black' : 'transparent'} width={45} height={45} />
                 }
                 // You can return any component that you like here!
                 return <IconComponent name={iconName} size={28} color={tintColor} />;
@@ -136,6 +155,8 @@ const BottomTabNavigation = createBottomTabNavigator(
             showLabel: false,
             activeTintColor: 'black',
             inactiveTintColor: 'gray',
+            tabStyle: { margin: 0, padding: 0, height: 60 },
+            // style: { backgroundColor: 'white', height: 50, padding: 0, margin: 0 },
         }
     }
 )
@@ -151,7 +172,6 @@ const newBottomNav = createStackNavigator({
         }
     }
 })
-
 
 const App = createAppContainer(BottomTabNavigation);
 export default App;
